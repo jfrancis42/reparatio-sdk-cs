@@ -48,8 +48,8 @@ using (var client = new ReparatioClient("rp_YOUR_KEY"))
 
 The API key can be supplied in two ways, in order of precedence:
 
-1. Passed directly: `new ReparatioClient("rp_...")`
-2. Environment variable: `REPARATIO_API_KEY=rp_...`
+1. Passed directly: `new ReparatioClient("EXAMPLE-EXAMPLE-EXAMPLE")`
+2. Environment variable: `REPARATIO_API_KEY=EXAMPLE-EXAMPLE-EXAMPLE`
 
 Get a key at [reparatio.app](https://reparatio.app) (Professional plan — $79/mo). API access requires the Professional plan; the Standard plan ($29/mo) covers web UI only.
 
@@ -60,7 +60,7 @@ Get a key at [reparatio.app](https://reparatio.app) (Professional plan — $79/m
 `ReparatioClient` implements `IDisposable` and holds an `HttpClient`. Use it in a `using` block:
 
 ```csharp
-using (var client = new ReparatioClient("rp_..."))
+using (var client = new ReparatioClient("EXAMPLE-EXAMPLE-EXAMPLE"))
 {
     var result = await client.ConvertAsync("data.csv", "parquet");
 }
@@ -319,6 +319,23 @@ make test   # compile and run all 47 tests
 ```
 
 Requires `mcs` (Mono C# compiler) and `System.Web.Extensions.dll` from `mono-complete`.
+
+---
+
+## Running the Examples
+
+The repository includes 15 runnable examples covering every API method.
+
+```bash
+# build everything
+make
+
+# run all examples (against the Reparatio production API)
+REPARATIO_API_KEY=EXAMPLE-EXAMPLE-EXAMPLE \
+mono bin/Examples.exe
+```
+
+Set `REPARATIO_API_KEY` to your API key before running.
 
 ---
 
