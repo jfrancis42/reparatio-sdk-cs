@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+using System.Text.Json;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tests")]
 
@@ -387,8 +387,33 @@ namespace Reparatio
 
         internal static Dictionary<string, object> ParseJson(string json)
         {
-            var ser = new JavaScriptSerializer();
-            return ser.Deserialize<Dictionary<string, object>>(json);
+            using (var doc = JsonDocument.Parse(json))
+                return (Dictionary<string, object>)JsonElementToObject(doc.RootElement);
+        }
+
+        private static object JsonElementToObject(JsonElement el)
+        {
+            switch (el.ValueKind)
+            {
+                case JsonValueKind.Object:
+                    var dict = new Dictionary<string, object>();
+                    foreach (var prop in el.EnumerateObject())
+                        dict[prop.Name] = JsonElementToObject(prop.Value);
+                    return dict;
+                case JsonValueKind.Array:
+                    var list = new List<object>();
+                    foreach (var item in el.EnumerateArray())
+                        list.Add(JsonElementToObject(item));
+                    return list;
+                case JsonValueKind.String:
+                    return el.GetString();
+                case JsonValueKind.Number:
+                    if (el.TryGetInt64(out long l))  return l;
+                    return el.GetDouble();
+                case JsonValueKind.True:  return true;
+                case JsonValueKind.False: return false;
+                default: return null;
+            }
         }
 
         internal static string ToJsonArray(IList<string> list)
